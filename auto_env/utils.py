@@ -169,17 +169,19 @@ class Color:
 # 终端 Emoji 能力检测 (A6)
 def _supports_emoji() -> bool:
     """检测终端是否支持 Emoji 显示"""
+    # 终端编码必须是 UTF-8 系列
+    enc = (sys.stdout.encoding or '').lower()
+    if 'utf' not in enc and 'cp65001' not in enc:
+        return False
     if platform.system() == "Windows":
         ver = platform.version()
         try:
-            # Windows 10 build 16299+ 支持 Emoji
             if "10." in ver:
                 build = int(ver.split(".")[-1]) if ver.split(".")[-1].isdigit() else 0
                 return build >= 16299
         except (ValueError, IndexError):
             pass
         return False
-    # Linux/macOS: 检查 TERM 和 LANG
     term = os.environ.get("TERM", "")
     lang = os.environ.get("LANG", "")
     return "256color" in term or "utf" in lang.lower() or "UTF" in lang

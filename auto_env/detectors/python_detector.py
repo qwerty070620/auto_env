@@ -4,7 +4,14 @@ import os
 import re
 from pathlib import Path
 from .base import BaseDetector, DepInfo, DepType
-from ..utils import SKIP_DIRS
+
+# 常见大目录（本地定义，避免跨包相对导入）
+_SKIP_DIRS = {
+    "node_modules", ".git", "__pycache__", ".venv", "venv", ".tox",
+    ".mypy_cache", ".pytest_cache", ".ruff_cache", "target", "build",
+    "dist", ".gradle", ".idea", ".vscode", "vendor", "bower_components",
+    ".next", ".nuxt", ".output", ".svelte-kit",
+}
 
 
 class PythonDetector(BaseDetector):
@@ -42,7 +49,7 @@ class PythonDetector(BaseDetector):
         # 高效检查常见框架特征文件（跳过大目录，限制深度）
         file_names = set()
         for root, dirs, files in os.walk(project_dir, topdown=True):
-            dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
+            dirs[:] = [d for d in dirs if d not in _SKIP_DIRS]
             depth = root.replace(project_dir, "").count(os.sep)
             if depth > 3:
                 dirs[:] = []

@@ -41,7 +41,7 @@ echo.
 set /p url="   👉 URL: "
 if "%url%"=="" goto menu
 echo.
-python -m auto_env "%url%"
+python run.py "%url%"
 goto done
 
 :local_mode
@@ -55,12 +55,12 @@ echo.
 set /p path="   👉 路径: "
 if "%path%"=="" goto menu
 echo.
-python -m auto_env "%path%"
+python run.py "%path%"
 goto done
 
 :current_mode
 echo.
-python -m auto_env .
+python run.py .
 goto done
 
 :auto_mode
@@ -71,7 +71,7 @@ echo.
 set /p target="   👉: "
 if "%target%"=="" goto menu
 echo.
-python -m auto_env "%target%" -y
+python run.py "%target%" -y
 goto done
 
 :report_mode
@@ -82,7 +82,7 @@ echo.
 set /p target="   👉: "
 if "%target%"=="" goto menu
 echo.
-python -m auto_env "%target%" --no-install
+python run.py "%target%" --no-install
 goto done
 
 :generate_mode
@@ -93,7 +93,7 @@ echo.
 set /p target="   👉: "
 if "%target%"=="" goto menu
 echo.
-python -m auto_env "%target%" --generate
+python run.py "%target%" --generate
 goto done
 
 :done

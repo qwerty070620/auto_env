@@ -26,11 +26,24 @@ import os
 import sys
 import re
 
-from .detectors import ALL_DETECTORS, DetectionResult, DepInfo
-from .detectors.base import DepType
-from .system_deps import detect_system_deps
-from .installer import Installer
-from .utils import Color, print_colored, get_os_info, check_tool_installed, run_cmd, run_cmd_safe, SKIP_DIRS, MAX_SCAN_DEPTH, emoji as _e
+# 兼容两种运行方式：
+#   python -m auto_env        → 相对导入，__package__ == "auto_env"
+#   python auto_env.py        → 绝对导入，自动加父目录到 sys.path
+if __package__ is None or not __package__:
+    _parent = os.path.dirname(os.path.abspath(__file__))
+    if _parent not in sys.path:
+        sys.path.insert(0, _parent)
+    from detectors import ALL_DETECTORS, DetectionResult, DepInfo  # type: ignore
+    from detectors.base import DepType  # type: ignore
+    from system_deps import detect_system_deps  # type: ignore
+    from installer import Installer  # type: ignore
+    from utils import Color, print_colored, get_os_info, check_tool_installed, run_cmd, run_cmd_safe, SKIP_DIRS, MAX_SCAN_DEPTH, emoji as _e  # type: ignore
+else:
+    from .detectors import ALL_DETECTORS, DetectionResult, DepInfo
+    from .detectors.base import DepType
+    from .system_deps import detect_system_deps
+    from .installer import Installer
+    from .utils import Color, print_colored, get_os_info, check_tool_installed, run_cmd, run_cmd_safe, SKIP_DIRS, MAX_SCAN_DEPTH, emoji as _e
 
 
 # 全局 verbose 标志
@@ -56,7 +69,6 @@ def detect_project(project_dir: str) -> list[DetectionResult]:
 
 def _fallback_detect(project_dir: str) -> list[DetectionResult]:
     """通用回退检测 — 根据文件后缀猜测，跳过常见大目录和深层目录"""
-    from .detectors.base import DetectionResult
     result = DetectionResult(
         project_type="unknown",
         project_name=os.path.basename(os.path.abspath(project_dir)),
@@ -557,18 +569,18 @@ def main():
     # ─── 无参数交互模式（供 启动.bat 调用） ───
     if args.target is None:
         print_colored("\n" + "=" * 62, Color.BLUE)
-        print_colored("  🚀  AutoEnv — 万能开源项目环境一键配置", Color.BOLD)
+        print_colored(f"  {_e('🚀', '[>>]')}  AutoEnv — 万能开源项目环境一键配置", Color.BOLD)
         print_colored("=" * 62, Color.BLUE)
         print()
         print("  请输入开源项目路径或 GitHub URL：")
         print()
-        print("     📁  例: C:\\projects\\my-app")
-        print("     📁  例: .\\my-project")
-        print("     🔗  例: https://github.com/psf/requests")
-        print("     🔗  例: git@github.com:user/repo.git")
+        print(f"     {_e('📁', '[D]')}  例: C:\\projects\\my-app")
+        print(f"     {_e('📁', '[D]')}  例: .\\my-project")
+        print(f"     {_e('🔗', '[L]')}  例: https://github.com/psf/requests")
+        print(f"     {_e('🔗', '[L]')}  例: git@github.com:user/repo.git")
         print()
         try:
-            target = input("  👉 ").strip().strip('"')
+            target = input(f"  {_e('👉', '>>')} ").strip().strip('"')
         except (EOFError, KeyboardInterrupt):
             print("\n  已退出")
             return
